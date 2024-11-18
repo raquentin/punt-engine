@@ -25,3 +25,24 @@ cabal.project.local~
 .ghc.environment.*
 /inst
 .nvim/
+
+vivado/project/
+*.jou
+*.log
+*.str
+*.wdb
+*.backup
+
+# Clash generated files
+hdl/clash/generated/
+
+# Build outputs
+build/
+
+# Simulation outputs
+sim/*.wdb
+sim/*.log
+xsim.dir/
+
+# Documentation build
+docs/_build/
