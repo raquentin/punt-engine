@@ -24,3 +24,4 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 /inst
+.nvim/
