@@ -7,6 +7,23 @@ on:
     branches: [ main ]
 
 jobs:
+  moving-average-accumulator-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install -y verilator make
+
+      - name: Run Simulation
+        run: |
+          cd hdl/sv/moving_average_accumulator
+          make test
+
+
   dmalib-test:
     runs-on: ubuntu-latest
 

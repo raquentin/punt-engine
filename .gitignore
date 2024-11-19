@@ -46,3 +46,7 @@ xsim.dir/
 
 # Documentation build
 docs/_build/
+
+# Verilator build
+obj_dir/
+waveform.vcd
