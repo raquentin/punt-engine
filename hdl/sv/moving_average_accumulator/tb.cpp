@@ -11,11 +11,10 @@
 int main(int argc, char **argv) {
     Verilated::commandArgs(argc, argv);
 
-    // Instantiate the module
     Vmoving_average_accumulator* top = new Vmoving_average_accumulator;
 
-    // Initialize trace dump
     VerilatedVcdC* tfp = nullptr;
+
 #ifdef TRACE
     Verilated::traceEverOn(true);
     tfp = new VerilatedVcdC;
@@ -23,80 +22,72 @@ int main(int argc, char **argv) {
     tfp->open("waveform.vcd");
 #endif
 
-    // Simulation time variables
     vluint64_t sim_time = 0;
 
-    // Initialize inputs
+    // initialize inputs
     top->clk = 0;
     top->reset = 1;
     top->d_in = 0;
 
-    // Parameters (must match the module's parameters)
-    const int n = 3; // Number of bits for N (window size = 2^n)
-    const int N = 1 << n; // Moving average window size
-    const int DATA_WIDTH = 16;
+    // match .sv file's params
+    const int Exponent = 3;
+    const int N = 1 << Exponent;
+    const int DataWidth = 16;
 
-    // Variables for checking the moving average
-    std::vector<int> sample_buffer(N, 0);
-    int acc = 0;
+    std::vector<int16_t> sample_buffer(N, 0);
+    int32_t acc = 0; // using 32 bits to prevent overflow
 
-    // Simulation loop
+    // current index pointing to the oldest sample
+    int oldest_index = 0;
+
+    // sim loop
     while (sim_time < SIM_TIME) {
-        // Toggle clock
+        // toggle clock
         top->clk = !top->clk;
 
-        // Apply inputs on the rising edge
+        // apply inputs on the rising edge
         if (top->clk) {
-            // De-assert reset after a few cycles
-            if (sim_time > 4) {
-                top->reset = 0;
-            }
-
-            // Provide input data (example pattern or random data)
-            int input_data = (sim_time / 2) % 256; // Example data pattern
+            // provide randomish input data
+            int16_t input_data = (sim_time / 2) % 256;
             top->d_in = input_data;
 
-            // Update expected accumulator and sample buffer
+            // update expected accumulator and sample buffer
             if (!top->reset) {
-                // Subtract the oldest sample and add the new one
-                acc -= sample_buffer[N - 1];
+                // subtract the oldest sample and add the new one
+                acc -= sample_buffer[oldest_index];
                 acc += input_data;
 
-                // Shift the sample buffer and insert new sample
-                for (int i = N - 1; i > 0; i--) {
-                    sample_buffer[i] = sample_buffer[i - 1];
-                }
-                sample_buffer[0] = input_data;
+                // replace the oldest sample with the new input
+                sample_buffer[oldest_index] = input_data;
 
-                // Compute expected output
-                int expected_output = acc >> n;
+                // update the oldest index (circularly)
+                oldest_index = (oldest_index + 1) % N;
 
-                // Sign-extension for comparison
-                int16_t expected_output_s = static_cast<int16_t>(expected_output);
+                // compute expected output
+                int16_t expected_output = acc >> Exponent;
 
-                // Compare expected output with module output
-                if (top->d_out != expected_output_s) {
+                // compare and err if bad
+                if (top->d_out != expected_output) {
                     std::cerr << "Mismatch at time " << sim_time
-                              << ": expected " << expected_output_s
+                              << ": expected " << expected_output
                               << ", got " << top->d_out << std::endl;
-                    exit(EXIT_FAILURE); // Exit with non-zero status code
+                    exit(EXIT_FAILURE);
                 }
             }
         }
 
-        // Evaluate the model
         top->eval();
 
-        // Dump signals to waveform
+        // dump signals to waveform
 #ifdef TRACE
         if (tfp) tfp->dump(sim_time);
 #endif
 
-        // Time advances in steps of 1 (arbitrary units)
+        // inc time
         sim_time++;
     }
 
-    // Final model cleanup
+    // cleanup
     top->final();
 
 #ifdef TRACE
@@ -106,9 +97,10 @@ int main(int argc, char **argv) {
     }
 #endif
 
-    // Cleanup
+    // cleanup
     delete top;
 
     std::cout << "Simulation completed successfully." << std::endl;
-    return EXIT_SUCCESS; // Return zero on success
+    return EXIT_SUCCESS;
 }
+

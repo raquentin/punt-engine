@@ -35,5 +35,3 @@ clean:
 # Phony target for CI testing (exits with non-zero status on failure)
 .PHONY: test
 test: run_simulation
-
-
