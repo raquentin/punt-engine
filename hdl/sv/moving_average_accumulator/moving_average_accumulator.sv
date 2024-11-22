@@ -4,8 +4,8 @@ module moving_average_accumulator #(
 ) (
     input wire clk,
     input wire reset,
-    input wire signed [DataWidth-1:0] d_in,
-    output reg signed [DataWidth-1:0] d_out
+    input wire unsigned [DataWidth-1:0] d_in,
+    output reg unsigned [DataWidth-1:0] d_out
 );
 
   localparam integer N = 1 << Exponent;

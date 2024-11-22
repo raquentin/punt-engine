@@ -1,106 +1,75 @@
-#include "Vmoving_average_accumulator.h"     // Verilated model header
+#include "Vmoving_average_accumulator.h"
 #include "verilated.h"
-#include "verilated_vcd_c.h"                 // Tracing (VCD) header
-#include <iostream>
+#include "verilated_vcd_c.h"
 #include <cstdlib>
+#include <iostream>
 #include <vector>
 
-#define TRACE       // Enable waveform tracing
-#define SIM_TIME 1000  // Simulation time in clock cycles
+#define SIM_TIME 20 // Simulation time in clock cycles
 
 int main(int argc, char **argv) {
-    Verilated::commandArgs(argc, argv);
+  Verilated::commandArgs(argc, argv);
+  Vmoving_average_accumulator *top = new Vmoving_average_accumulator;
+  VerilatedVcdC *tfp = nullptr;
+  vluint64_t sim_time = 0;
 
-    Vmoving_average_accumulator* top = new Vmoving_average_accumulator;
+  top->clk = 0;
+  top->reset = 1;
+  top->d_in = 0;
 
-    VerilatedVcdC* tfp = nullptr;
+  const int Exponent = 3;
+  const int N = 1 << Exponent;
+  const int DataWidth = 16;
 
-#ifdef TRACE
-    Verilated::traceEverOn(true);
-    tfp = new VerilatedVcdC;
-    top->trace(tfp, 99);
-    tfp->open("waveform.vcd");
-#endif
+  uint16_t one_ago = 0;
+  uint16_t two_ago = 0;
+  uint16_t expected_out = 0;
 
-    vluint64_t sim_time = 0;
+  std::vector<uint16_t> sample_buffer(N, 0);
+  uint32_t acc = 0; // using 32 bits to prevent overflow
 
-    // initialize inputs
-    top->clk = 0;
-    top->reset = 1;
-    top->d_in = 0;
+  // current index pointing to the oldest sample
+  int oldest_index = 0;
 
-    // match .sv file's params
-    const int Exponent = 3;
-    const int N = 1 << Exponent;
-    const int DataWidth = 16;
+  while (sim_time < SIM_TIME) {
+    top->clk = !top->clk;
 
-    std::vector<int16_t> sample_buffer(N, 0);
-    int32_t acc = 0; // using 32 bits to prevent overflow
+    if (sim_time > 4)
+      top->reset = 0;
 
-    // current index pointing to the oldest sample
-    int oldest_index = 0;
+    if (top->clk) {
+      uint16_t input_data = (3 * sim_time + 2) % 8031;
+      top->d_in = input_data;
+      if (!top->reset) {
+        acc -= sample_buffer[oldest_index];
+        acc += input_data;
+        sample_buffer[oldest_index] = input_data;
 
-    // sim loop
-    while (sim_time < SIM_TIME) {
-        // toggle clock
-        top->clk = !top->clk;
+        oldest_index = (oldest_index + 1) % N;
 
-        // apply inputs on the rising edge
-        if (top->clk) {
-            // provide randomish input data
-            int16_t input_data = (sim_time / 2) % 256;
-            top->d_in = input_data;
+        two_ago = one_ago;
+        one_ago = expected_out;
+        expected_out = acc >> Exponent;
 
-            // update expected accumulator and sample buffer
-            if (!top->reset) {
-                // subtract the oldest sample and add the new one
-                acc -= sample_buffer[oldest_index];
-                acc += input_data;
-
-                // replace the oldest sample with the new input
-                sample_buffer[oldest_index] = input_data;
-
-                // update the oldest index (circularly)
-                oldest_index = (oldest_index + 1) % N;
-
-                // compute expected output
-                int16_t expected_output = acc >> Exponent;
-
-                // compare and err if bad
-                if (top->d_out != expected_output) {
-                    std::cerr << "Mismatch at time " << sim_time
-                              << ": expected " << expected_output
-                              << ", got " << top->d_out << std::endl;
-                    exit(EXIT_FAILURE);
-                }
-            }
+        // compare and err if bad
+        if (top->d_out != two_ago) {
+          std::cerr << "Mismatch on simtime" << sim_time << ": expected "
+                    << two_ago << ", got " << top->d_out << std::endl;
+          return EXIT_FAILURE;
         }
-
-        top->eval();
-
-        // dump signals to waveform
-#ifdef TRACE
-        if (tfp) tfp->dump(sim_time);
-#endif
-
-        // inc time
-        sim_time++;
+      }
     }
 
-    // cleanup
-    top->final();
+    top->eval();
 
-#ifdef TRACE
-    if (tfp) {
-        tfp->close();
-        delete tfp;
-    }
-#endif
+    sim_time++;
+  }
 
-    // cleanup
-    delete top;
+  top->final();
 
-    std::cout << "Simulation completed successfully." << std::endl;
-    return EXIT_SUCCESS;
+  // cleanup
+  delete top;
+
+  std::cout << "Simulation completed successfully." << std::endl;
+  return EXIT_SUCCESS;
 }
-
