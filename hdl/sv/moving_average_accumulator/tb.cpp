@@ -62,6 +62,7 @@ int main(int argc, char **argv) {
 
     top->eval();
 
+
     sim_time++;
   }
 
@@ -73,3 +74,4 @@ int main(int argc, char **argv) {
   std::cout << "Simulation completed successfully." << std::endl;
   return EXIT_SUCCESS;
 }
+
