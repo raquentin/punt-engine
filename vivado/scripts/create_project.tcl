@@ -1,6 +1,6 @@
 set project_name "punt-engine"
 set project_dir "../project"
-set part_name "xc7a200tfbg484-1" ;# fpga part number
+set part_name "XC7A100T-2FGG484I"; # fpga part number
 set top_module "punt-top"
 
 create_project $project_name $project_dir -part $part_name -force
