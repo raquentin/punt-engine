@@ -34,7 +34,7 @@ jobs:
 
       - name: Run All Tests
         run: |
-          nix develop .#devShell --command bash -c "
+          nix develop .#devShells --command bash -c "
             # Moving Average Accumulator Test
             cd cores/moving_average_accumulator
             make test
