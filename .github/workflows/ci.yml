@@ -7,44 +7,46 @@ on:
     branches: [ main ]
 
 jobs:
-  moving-average-accumulator-test:
+  build-and-test:
+    name: Build and Test All Components
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get install -y verilator make
-
-      - name: Run Simulation
-        run: |
-          cd cores/moving_average_accumulator
-          make test
-
-
-  dmalib-test:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Install Zig (version 0.13)
-      - name: Install Zig
-        uses: mlugg/setup-zig@v1
+      - name: Install Nix
+        uses: cachix/install-nix-action@v16
         with:
-          zig-version: '0.13.0'  # Specify the exact version you are using
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
-      # Verify Zig installation
-      - name: Verify Zig
-        run: zig version
+      - name: Cache Nix Store
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/nix
+            ~/.nix-defexpr
+            ~/.nix-profile
+          key: ${{ runner.os }}-nix-${{ hashFiles('**/flake.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-nix-
 
-      # Build the project
-      - name: Build project and run
+      - name: Run All Tests
         run: |
-          cd dmalib
-          zig build
-          ./zig-out/bin/dmalib
+          nix develop .#devShell --command bash -c "
+            # Moving Average Accumulator Test
+            cd cores/moving_average_accumulator
+            make test
+
+            # DMA Library Test
+            cd ../../dmalib
+            zig build
+            ./zig-out/bin/dmalib
+
+            # Haskell Tests
+            cd ../cores/pipelined_order_book
+            cabal build
+            cabal run test-library
+            cabal run doctests
+          "

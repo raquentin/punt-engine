@@ -1,5 +1,5 @@
 {
-  description = "A comprehensive development environemnt for punt-engine.";
+  description = "A comprehensive development environment for punt-engine.";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -9,16 +9,25 @@
   outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs {
+          inherit system;
+        };
 
-        pipelined_order_book = pkgs.haskellPackages.callCabal2nix "pipelined_order_book" ./cores/pipelined_order_book { };
+        haskellPackages = pkgs.haskellPackages;
 
-        # Define the development shell
+      packages = {
+          pipelined_order_book = haskellPackages.callCabal2nix "pipelined_order_book" ./cores/pipelined_order_book { };
+        };
+
         devShell = pkgs.mkShell {
           buildInputs = [
             pkgs.haskellPackages.ghc
             pkgs.haskellPackages.cabal-install
-            pkgs.haskellPackages.clash-ghc
+            pkgs.haskellPackages.clash-prelude
+            pkgs.haskellPackages.clash-lib
+            pkgs.haskellPackages.clash-prelude-hedgehog
+            pkgs.haskellPackages.tasty-hedgehog
+            pkgs.haskellPackages.hedgehog
 
             pkgs.verilator
 
@@ -33,11 +42,6 @@
             echo "Welcome to the punt-engine dev env."
           '';
         };
-
-        packages = {
-          pipelined_order_book = pipelined_order_book;
-        };
-
       in {
         packages = packages;
 
@@ -45,3 +49,4 @@
       }
     );
 }
+

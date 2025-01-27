@@ -1,0 +1,105 @@
+{
+    "components": [
+        "accum"
+    ],
+    "dependencies": {
+        "transitive": []
+    },
+    "domains": {
+        "Dom50": {
+            "active_edge": "Rising",
+            "init_behavior": "Defined",
+            "period": 20000,
+            "reset_kind": "Asynchronous",
+            "reset_polarity": "ActiveHigh"
+        },
+        "IntelSystem": {
+            "active_edge": "Rising",
+            "init_behavior": "Defined",
+            "period": 10000,
+            "reset_kind": "Asynchronous",
+            "reset_polarity": "ActiveHigh"
+        },
+        "System": {
+            "active_edge": "Rising",
+            "init_behavior": "Defined",
+            "period": 10000,
+            "reset_kind": "Asynchronous",
+            "reset_polarity": "ActiveHigh"
+        },
+        "XilinxSystem": {
+            "active_edge": "Rising",
+            "init_behavior": "Defined",
+            "period": 10000,
+            "reset_kind": "Synchronous",
+            "reset_polarity": "ActiveHigh"
+        }
+    },
+    "files": [
+        {
+            "name": "accum_shim.cpp",
+            "sha256": "5abcaca52b57ad0e884cd74d67bf57e5193b1de914e0e8855b122d6c3af5ab12"
+        },
+        {
+            "name": "accum_shim.cpp",
+            "sha256": "5abcaca52b57ad0e884cd74d67bf57e5193b1de914e0e8855b122d6c3af5ab12"
+        },
+        {
+            "name": "accum.sdc",
+            "sha256": "872a13ebab22d7d64ce0ca6c4f93a5c1622f788d8269f1451bdba354b37c57a4"
+        },
+        {
+            "name": "accum.v",
+            "sha256": "289b55da1727d5d617102d84225f8ceba9cad6b7f42542883947b4eef64be0ff"
+        }
+    ],
+    "flags": [
+        20,
+        20
+    ],
+    "hash": "b1e53b5786e353c37f9a585beee9d29b8906b6ecbda05e5c89c9ecc4e137fc10",
+    "top_component": {
+        "name": "accum",
+        "ports_flat": [
+            {
+                "direction": "in",
+                "domain": "Dom50",
+                "is_clock": true,
+                "name": "CLK",
+                "type_name": "",
+                "width": 1
+            },
+            {
+                "direction": "in",
+                "domain": "Dom50",
+                "is_clock": false,
+                "name": "RST",
+                "type_name": "",
+                "width": 1
+            },
+            {
+                "direction": "in",
+                "domain": "Dom50",
+                "is_clock": false,
+                "name": "EN",
+                "type_name": "",
+                "width": 1
+            },
+            {
+                "direction": "in",
+                "is_clock": false,
+                "name": "DIN",
+                "type_name": "[7:0]",
+                "width": 8
+            },
+            {
+                "direction": "out",
+                "is_clock": false,
+                "name": "DOUT",
+                "type_name": "[7:0]",
+                "width": 8
+            }
+        ]
+    },
+    "version": "unstable"
+}
