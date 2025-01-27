@@ -81,12 +81,12 @@ jobs:
 
       - name: Cabal Setup
         run: |
+          cd cores/pipelined_order_book
           cabal update
           cabal install --only-dependencies
 
       - name: Cabal Build & Test
         run: |
-          cd cores/pipelined_order_book
           cabal update
           cabal build
           cabal testzig-out/bin/dmalib
