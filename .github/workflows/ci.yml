@@ -82,7 +82,7 @@ jobs:
       - name: Cabal Setup
         run: |
           cabal update
-          cabal install --only-dependencies --enable-tests
+          cabal install --only-dependencies
 
       - name: Cabal Build & Test
         run: |
