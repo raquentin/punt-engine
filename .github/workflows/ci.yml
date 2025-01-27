@@ -20,7 +20,7 @@ jobs:
 
       - name: Run Simulation
         run: |
-          cd hdl/sv/moving_average_accumulator
+          cd cores/moving_average_accumulator
           make test
 
 

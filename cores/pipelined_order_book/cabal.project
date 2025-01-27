@@ -1,5 +1,5 @@
 packages:
-  punt-engine-haskell-cores.cabal
+  pipelined-order-book.cabal
 
 write-ghc-environment-files: always
 

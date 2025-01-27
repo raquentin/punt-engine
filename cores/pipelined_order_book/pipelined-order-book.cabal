@@ -1,7 +1,7 @@
 cabal-version:       2.4
-name:                punt-engine-haskell-cores
+name:                pipelined-order-book
 version:             0.1
-license:             MIT
+license:             GPL-3.0-only
 author:              Race Williams <race@raquent.in>
 maintainer:          Race Williams <race@raquent.in>
 
@@ -75,7 +75,7 @@ common common-options
     Cabal,
 
     -- clash-prelude will set suitable version bounds for the plugins
-    clash-prelude >= 1.8.1 && < 1.10,
+    clash-prelude >= 1.8.2 && < 1.10,
     ghc-typelits-natnormalise,
     ghc-typelits-extra,
     ghc-typelits-knownnat
@@ -85,25 +85,20 @@ library
   import: common-options
   hs-source-dirs: src
   exposed-modules:
-    FixParser.Top
     Example.Project
   default-language: Haskell2010
 
--- Builds the executable 'clash', with punt-engine-haskell-cores project in scope
+-- Builds the executable 'clash', with pipelined-order-book project in scope
 executable clash
   main-is: bin/Clash.hs
   default-language: Haskell2010
-  Build-Depends: base, clash-ghc, punt-engine-haskell-cores
-  if !os(Windows)
-    ghc-options: -dynamic
+  Build-Depends: base, clash-ghc, pipelined-order-book
 
--- Builds the executable 'clashi', with punt-engine-haskell-cores project in scope
+-- Builds the executable 'clashi', with pipelined-order-book project in scope
 executable clashi
   main-is: bin/Clashi.hs
   default-language: Haskell2010
-  if !os(Windows)
-    ghc-options: -dynamic
-  build-depends: base, clash-ghc, punt-engine-haskell-cores
+  build-depends: base, clash-ghc, pipelined-order-book
 
 test-suite doctests
   type:             exitcode-stdio-1.0
@@ -113,7 +108,7 @@ test-suite doctests
   hs-source-dirs:   tests
   build-depends:
     base,
-    punt-engine-haskell-cores,
+    pipelined-order-book,
     doctest-parallel >= 0.2 && < 0.4,
 
 test-suite test-library
@@ -126,10 +121,10 @@ test-suite test-library
   other-modules:
     Tests.Example.Project
   build-depends:
-    punt-engine-haskell-cores,
+    pipelined-order-book,
     QuickCheck,
     clash-prelude-hedgehog,
     hedgehog,
-    tasty >= 1.2 && < 1.5,
+    tasty >= 1.2 && < 1.6,
     tasty-hedgehog,
     tasty-th
