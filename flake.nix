@@ -25,6 +25,7 @@
             pkgs.haskellPackages.cabal-install
             pkgs.haskellPackages.clash-prelude
             pkgs.haskellPackages.clash-lib
+            pkgs.haskellPackages.clash-ghc
             pkgs.haskellPackages.clash-prelude-hedgehog
             pkgs.haskellPackages.tasty-hedgehog
             pkgs.haskellPackages.hedgehog
