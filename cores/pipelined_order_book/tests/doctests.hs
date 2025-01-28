@@ -4,5 +4,4 @@ import System.Environment (getArgs)
 import Test.DocTest (mainFromCabal)
 
 main :: IO ()
-main = mainFromCabal "my-clash-project" =<< getArgs
-
+main = mainFromCabal "pipelined-order-book" =<< getArgs
