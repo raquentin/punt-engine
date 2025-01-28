@@ -34,7 +34,8 @@ vivado/project/
 *.backup
 
 # Clash generated files
-hdl/clash/generated/
+*/clash/generated/
+cores/*/verilog
 
 # Build outputs
 build/
