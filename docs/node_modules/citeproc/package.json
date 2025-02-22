@@ -1,0 +1,19 @@
+{
+    "name": "citeproc",
+    "version": "2.4.63",
+    "description": "The citeproc-js citation formatting module, in CommonJS format. This version is based on citeproc-js 1.4.63",
+    "main": "citeproc_commonjs.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/juris-m/citeproc-js.git"
+    },
+    "files": [
+        "citeproc_commonjs.js"
+    ],
+    "author": "Michael McMillan <email@michaelmcmillan.net> (http://michaelmcmillan.net/)",
+    "contributors": [
+        "Frank Bennett <biercenator@gmail.com> (https://juris-m.github.io)"
+    ],
+    "license": "CPAL-1.0 OR AGPL-1.0",
+    "dependencies": {}
+}

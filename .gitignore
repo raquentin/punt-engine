@@ -51,3 +51,8 @@ docs/_build/
 # Verilator build
 obj_dir/
 waveform.vcd
+
+# Docs
+.DS_Store
+.obisidan
+node_modules/

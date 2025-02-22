@@ -1,0 +1,1 @@
+{"version":3,"file":"generateUID.js","sources":["../../../../../../src/rendering/renderers/shared/texture/utils/generateUID.ts"],"sourcesContent":["let uidCount = 0;\n\nexport function generateUID(): number\n{\n    return uidCount++;\n}\n"],"names":[],"mappings":";;;AAAA,IAAI,QAAW,GAAA,CAAA,CAAA;AAER,SAAS,WAChB,GAAA;AACI,EAAO,OAAA,QAAA,EAAA,CAAA;AACX;;;;"}

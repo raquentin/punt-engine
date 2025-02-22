@@ -1,0 +1,44 @@
+{
+  "name": "@citation-js/core",
+  "version": "0.7.14",
+  "description": "Convert different bibliographic metadata sources",
+  "keywords": [
+    "citation-js",
+    "citation",
+    "bibliography"
+  ],
+  "author": "Lars Willighagen <lars.willighagen@gmail.com>",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "lib-mjs/index.js",
+  "directories": {
+    "lib": "src",
+    "test": "__tests__"
+  },
+  "homepage": "https://citation.js.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/citation-js/citation-js.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/citation-js/citation-js/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "lib",
+    "lib-mjs"
+  ],
+  "scripts": {
+    "test": "mocha -c -R dot test/*.spec.js"
+  },
+  "dependencies": {
+    "@citation-js/date": "^0.5.0",
+    "@citation-js/name": "^0.4.2",
+    "fetch-ponyfill": "^7.1.0",
+    "sync-fetch": "^0.4.1"
+  },
+  "gitHead": "1e5f61227c10efc8387ef55816a8d8cf224471f5"
+}

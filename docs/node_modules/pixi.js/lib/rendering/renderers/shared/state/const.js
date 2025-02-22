@@ -1,0 +1,20 @@
+'use strict';
+
+"use strict";
+const BLEND_TO_NPM = {
+  normal: "normal-npm",
+  add: "add-npm",
+  screen: "screen-npm"
+};
+var STENCIL_MODES = /* @__PURE__ */ ((STENCIL_MODES2) => {
+  STENCIL_MODES2[STENCIL_MODES2["DISABLED"] = 0] = "DISABLED";
+  STENCIL_MODES2[STENCIL_MODES2["RENDERING_MASK_ADD"] = 1] = "RENDERING_MASK_ADD";
+  STENCIL_MODES2[STENCIL_MODES2["MASK_ACTIVE"] = 2] = "MASK_ACTIVE";
+  STENCIL_MODES2[STENCIL_MODES2["RENDERING_MASK_REMOVE"] = 3] = "RENDERING_MASK_REMOVE";
+  STENCIL_MODES2[STENCIL_MODES2["NONE"] = 4] = "NONE";
+  return STENCIL_MODES2;
+})(STENCIL_MODES || {});
+
+exports.BLEND_TO_NPM = BLEND_TO_NPM;
+exports.STENCIL_MODES = STENCIL_MODES;
+//# sourceMappingURL=const.js.map

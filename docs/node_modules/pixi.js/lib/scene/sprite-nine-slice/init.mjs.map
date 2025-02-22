@@ -1,0 +1,1 @@
+{"version":3,"file":"init.mjs","sources":["../../../src/scene/sprite-nine-slice/init.ts"],"sourcesContent":["import { extensions } from '../../extensions/Extensions';\nimport { NineSliceSpritePipe } from './NineSliceSpritePipe';\n\nextensions.add(NineSliceSpritePipe);\n"],"names":[],"mappings":";;;;AAGA,UAAA,CAAW,IAAI,mBAAmB,CAAA"}

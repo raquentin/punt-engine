@@ -1,0 +1,69 @@
+/**
+ * A generic class for managing a pool of items.
+ * @template T The type of items in the pool. Must implement {@link utils.PoolItem}.
+ * @memberof utils
+ */
+export declare class Pool<T extends PoolItem> {
+    readonly _classType: PoolItemConstructor<T>;
+    private readonly _pool;
+    private _count;
+    private _index;
+    /**
+     * Constructs a new Pool.
+     * @param ClassType - The constructor of the items in the pool.
+     * @param {number} [initialSize] - The initial size of the pool.
+     */
+    constructor(ClassType: PoolItemConstructor<T>, initialSize?: number);
+    /**
+     * Prepopulates the pool with a given number of items.
+     * @param total - The number of items to add to the pool.
+     */
+    prepopulate(total: number): void;
+    /**
+     * Gets an item from the pool. Calls the item's `init` method if it exists.
+     * If there are no items left in the pool, a new one will be created.
+     * @param {unknown} [data] - Optional data to pass to the item's constructor.
+     * @returns {T} The item from the pool.
+     */
+    get(data?: unknown): T;
+    /**
+     * Returns an item to the pool. Calls the item's `reset` method if it exists.
+     * @param {T} item - The item to return to the pool.
+     */
+    return(item: T): void;
+    /**
+     * Gets the number of items in the pool.
+     * @readonly
+     * @member {number}
+     */
+    get totalSize(): number;
+    /**
+     * Gets the number of items in the pool that are free to use without needing to create more.
+     * @readonly
+     * @member {number}
+     */
+    get totalFree(): number;
+    /**
+     * Gets the number of items in the pool that are currently in use.
+     * @readonly
+     * @member {number}
+     */
+    get totalUsed(): number;
+    /** clears the pool - mainly used for debugging! */
+    clear(): void;
+}
+/**
+ * An object that can be stored in a {@link utils.Pool}.
+ * @memberof utils
+ */
+export type PoolItem = {
+    init?: (data?: any) => void;
+    reset?: () => void;
+    [key: string]: any;
+};
+/**
+ * The constructor of an object that can be stored in a {@link utils.Pool}.
+ * @typeParam K - The type of the object that can be stored in a {@link utils.Pool}.
+ * @memberof utils
+ */
+export type PoolItemConstructor<K extends PoolItem> = new () => K;

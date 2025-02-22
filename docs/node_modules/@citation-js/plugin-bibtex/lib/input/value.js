@@ -1,0 +1,539 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parse = parse;
+exports.parseAnnotation = parseAnnotation;
+exports.valueGrammar = void 0;
+var _core = require("@citation-js/core");
+var _moo = _interopRequireDefault(require("moo"));
+var _config = _interopRequireDefault(require("../config.js"));
+var constants = _interopRequireWildcard(require("./constants.js"));
+var _name = require("./name.js");
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+const text = {
+  commandBegin: {
+    match: '\\begin',
+    push: 'environment'
+  },
+  command: {
+    match: /\\(?:[a-zA-Z]+|.) */,
+    value: s => s.slice(1).trim()
+  },
+  lbrace: {
+    match: '{',
+    push: 'bracedLiteral'
+  },
+  mathShift: {
+    match: '$',
+    push: 'mathLiteral'
+  },
+  whitespace: {
+    match: /[\s]+|~/,
+    lineBreaks: true,
+    value(token) {
+      return token === '~' ? '\xa0' : ' ';
+    }
+  }
+};
+const lexer = _moo.default.states({
+  stringLiteral: _objectSpread(_objectSpread({}, text), {}, {
+    text: /[^{$}\s~\\]+/
+  }),
+  namesLiteral: _objectSpread(_objectSpread({
+    and: /\s+[aA][nN][dD]\s+/,
+    comma: ',',
+    hyphen: '-',
+    equals: '='
+  }, text), {}, {
+    text: /[^{$}\s~\\,=-]+/
+  }),
+  listLiteral: _objectSpread(_objectSpread({
+    and: /\s+and\s+/
+  }, text), {}, {
+    text: /[^{$}\s~\\]+/
+  }),
+  separatedLiteral: _objectSpread(_objectSpread({
+    comma: ','
+  }, text), {}, {
+    text: /[^{$}\s~\\,]+/
+  }),
+  annotation: _objectSpread(_objectSpread({}, text), {}, {
+    colon: ':',
+    equals: '=',
+    comma: ',',
+    semicolon: ';',
+    quote: '"',
+    itemCount: /\d+/,
+    text: /[^{$}\s~\\":;,=]+/
+  }),
+  bracedLiteral: _objectSpread(_objectSpread({}, text), {}, {
+    rbrace: {
+      match: '}',
+      pop: true
+    },
+    text: /[^{$}\s~\\]+/
+  }),
+  mathLiteral: _objectSpread(_objectSpread({}, text), {}, {
+    mathShift: {
+      match: '$',
+      pop: true
+    },
+    script: /[\^_]/,
+    text: /[^{$}\s~\\^_]+/
+  }),
+  environment: _objectSpread(_objectSpread({
+    commandEnd: {
+      match: '\\end',
+      pop: true
+    }
+  }, text), {}, {
+    text: /[^{$}\s~\\]+/
+  })
+});
+function flattenConsString(string) {
+  string[0];
+  return string;
+}
+function applyFormatting(text, format) {
+  if (format in constants.formatting) {
+    return text && constants.formatting[format].join(text);
+  } else {
+    return text;
+  }
+}
+const valueGrammar = exports.valueGrammar = new _core.util.Grammar({
+  String() {
+    let output = '';
+    while (!this.matchEndOfFile()) {
+      output += this.consumeRule('Text');
+    }
+    return flattenConsString(output);
+  },
+  StringNames() {
+    const list = [];
+    while (true) {
+      this.consumeToken('whitespace', true);
+      list.push(this.consumeRule('Name'));
+      this.consumeToken('whitespace', true);
+      if (this.matchEndOfFile()) {
+        return list;
+      } else {
+        this.consumeToken('and');
+      }
+    }
+  },
+  Name() {
+    const pieces = [];
+    while (true) {
+      pieces.push(this.consumeRule('NamePiece'));
+      if (this.matchEndOfFile() || this.matchToken('and')) {
+        return (0, _name.orderNamePieces)(pieces);
+      } else {
+        this.consumeToken('comma');
+        this.consumeToken('whitespace', true);
+      }
+    }
+  },
+  NamePiece() {
+    const parts = [];
+    while (true) {
+      const part = this.consumeRule('NameToken');
+      if (part.label) {
+        part.label = (0, _name.formatNameParts)([...parts, {
+          value: part.label
+        }]);
+        return [part];
+      }
+      parts.push(part);
+      if (this.matchEndOfFile() || this.matchToken('and') || this.matchToken('comma')) {
+        return parts;
+      } else {
+        while (this.matchToken('hyphen') || this.matchToken('whitespace')) {
+          this.consumeToken();
+        }
+      }
+    }
+  },
+  NameToken() {
+    let upperCase = null;
+    let value = '';
+    while (true) {
+      if (upperCase === null && this.matchToken('text')) {
+        const text = this.consumeToken().value;
+        value += text;
+        upperCase = (0, _name.getStringCase)(text);
+      } else if (this.matchEndOfFile() || this.matchToken('and') || this.matchToken('comma') || this.matchToken('whitespace')) {
+        return {
+          value,
+          upperCase
+        };
+      } else if (this.matchToken('hyphen')) {
+        return {
+          value,
+          upperCase,
+          hyphenated: true
+        };
+      } else if (this.matchToken('equals')) {
+        this.consumeToken('equals');
+        const text = this.consumeRule('NamePiece');
+        if (text[0].label) {
+          value += '=' + text[0].label;
+        }
+        return {
+          value: (0, _name.formatNameParts)(text),
+          label: value
+        };
+      } else {
+        value += this.consumeRule('Text');
+      }
+    }
+  },
+  StringList() {
+    const list = [];
+    while (!this.matchEndOfFile()) {
+      let output = '';
+      while (!this.matchEndOfFile() && !this.matchToken('and')) {
+        output += this.consumeRule('Text');
+      }
+      list.push(flattenConsString(output));
+      this.consumeToken('and', true);
+    }
+    return list.length === 1 ? list[0] : list;
+  },
+  StringSeparated() {
+    const list = [];
+    while (!this.matchEndOfFile()) {
+      let output = '';
+      while (!this.matchEndOfFile() && !this.matchToken('comma')) {
+        output += this.consumeRule('Text');
+      }
+      list.push(output.trim());
+      this.consumeToken('comma', true);
+      this.consumeToken('whitespace', true);
+    }
+    return list;
+  },
+  StringVerbatim() {
+    let output = '';
+    while (!this.matchEndOfFile()) {
+      output += this.consumeToken().text;
+    }
+    return flattenConsString(output);
+  },
+  StringUri() {
+    const uri = this.consumeRule('StringVerbatim');
+    try {
+      if (decodeURI(uri) === uri) {
+        return encodeURI(uri);
+      } else {
+        return uri;
+      }
+    } catch (e) {
+      return encodeURI(uri);
+    }
+  },
+  StringTitleCase() {
+    this.state.sentenceCase = true;
+    let output = '';
+    while (!this.matchEndOfFile()) {
+      output += this.consumeRule('Text');
+    }
+    return flattenConsString(output);
+  },
+  Annotations() {
+    const annotations = {};
+    while (true) {
+      const {
+        scope,
+        item,
+        part,
+        value
+      } = this.consumeRule('Annotation');
+      if (scope === 'part') {
+        if (!annotations.part) {
+          annotations.part = [];
+        }
+        if (!annotations.part[item]) {
+          annotations.part[item] = {};
+        }
+        annotations.part[item][part] = value;
+      } else if (scope === 'item') {
+        if (!annotations.item) {
+          annotations.item = [];
+        }
+        annotations.item[item] = value;
+      } else {
+        annotations.field = value;
+      }
+      if (this.matchEndOfFile()) {
+        break;
+      } else {
+        this.consumeToken('semicolon');
+        this.consumeRule('_');
+      }
+    }
+    return annotations;
+  },
+  Annotation() {
+    const annotation = {};
+    if (this.matchToken('itemCount')) {
+      annotation.item = parseInt(this.consumeToken('itemCount')) - 1;
+      if (this.matchToken('colon')) {
+        this.consumeToken('colon');
+        annotation.part = this.consumeToken('text');
+        annotation.scope = 'part';
+      } else {
+        annotation.scope = 'item';
+      }
+    } else {
+      annotation.scope = 'field';
+    }
+    this.consumeToken('equals');
+    this.consumeRule('_');
+    if (this.matchToken('quote')) {
+      this.consumeToken('quote');
+      let literal = '';
+      while (!this.matchToken('quote')) {
+        if (this.matchToken('itemCount') || this.matchToken('colon') || this.matchToken('comma') || this.matchToken('semicolon') || this.matchToken('equals')) {
+          literal += this.token.value;
+          this.token = this.lexer.next();
+        } else {
+          literal += this.consumeRule('Text');
+        }
+      }
+      this.consumeToken('quote');
+      annotation.value = flattenConsString(literal);
+      this.consumeRule('_');
+    } else {
+      annotation.value = [];
+      let output = '';
+      while (true) {
+        output += this.consumeRule('Text');
+        if (this.matchToken('comma')) {
+          this.consumeToken('comma');
+          this.consumeRule('_');
+          annotation.value.push(flattenConsString(output));
+          output = '';
+        } else if (this.matchEndOfFile() || this.matchToken('semicolon')) {
+          annotation.value.push(flattenConsString(output));
+          break;
+        }
+      }
+    }
+    return annotation;
+  },
+  BracketString() {
+    var _this$state;
+    let output = '';
+    this.consumeToken('lbrace');
+    const sentenceCase = this.state.sentenceCase;
+    this.state.sentenceCase = sentenceCase && this.matchToken('command');
+    (_this$state = this.state).partlyLowercase && (_this$state.partlyLowercase = this.state.sentenceCase);
+    while (!this.matchToken('rbrace')) {
+      output += this.consumeRule('Text');
+    }
+    const topLevel = sentenceCase && !this.state.sentenceCase;
+    const protectCase = topLevel && this.state.partlyLowercase;
+    this.state.sentenceCase = sentenceCase;
+    this.consumeToken('rbrace');
+    return protectCase ? applyFormatting(output, 'nocase') : output;
+  },
+  MathString() {
+    let output = '';
+    this.consumeToken('mathShift');
+    while (!this.matchToken('mathShift')) {
+      if (this.matchToken('script')) {
+        const script = this.consumeToken('script').value;
+        const text = this.consumeRule('Text').split('');
+        if (text.every(char => char in constants.mathScripts[script])) {
+          output += text.map(char => constants.mathScripts[script][char]).join('');
+        } else {
+          const formatName = constants.mathScriptFormatting[script];
+          output += constants.formatting[formatName].join(text.join(''));
+        }
+        continue;
+      }
+      if (this.matchToken('command')) {
+        const command = this.token.value;
+        if (command in constants.mathScriptFormatting) {
+          this.consumeToken('command');
+          const text = this.consumeRule('BracketString');
+          output += applyFormatting(text, constants.mathScriptFormatting[command]);
+          continue;
+        }
+      }
+      output += this.consumeRule('Text');
+    }
+    this.consumeToken('mathShift');
+    return output;
+  },
+  Text() {
+    if (this.matchToken('lbrace')) {
+      return this.consumeRule('BracketString');
+    } else if (this.matchToken('mathShift')) {
+      return this.consumeRule('MathString');
+    } else if (this.matchToken('whitespace')) {
+      return this.consumeToken('whitespace').value;
+    } else if (this.matchToken('commandBegin')) {
+      return this.consumeRule('EnclosedEnv');
+    } else if (this.matchToken('command')) {
+      return this.consumeRule('Command');
+    }
+    const text = this.consumeToken('text').value.replace(constants.ligaturePattern, ligature => constants.ligatures[ligature]);
+    const afterPunctuation = this.state.afterPunctuation;
+    this.state.afterPunctuation = /[?!.:]$/.test(text);
+    if (!this.state.sentenceCase) {
+      var _this$state2;
+      (_this$state2 = this.state).partlyLowercase || (_this$state2.partlyLowercase = text === text.toLowerCase() && text !== text.toUpperCase());
+      return text;
+    }
+    const [first, ...otherCharacters] = text;
+    const rest = otherCharacters.join('');
+    const restLowerCase = rest.toLowerCase();
+    if (rest !== restLowerCase) {
+      return text;
+    }
+    if (!afterPunctuation) {
+      return text.toLowerCase();
+    }
+    return first + restLowerCase;
+  },
+  Command() {
+    const commandToken = this.consumeToken('command');
+    const command = commandToken.value;
+    if (command in constants.formattingEnvs) {
+      const text = this.consumeRule('Env');
+      const format = constants.formattingEnvs[command];
+      return applyFormatting(text, format);
+    } else if (command in constants.formattingCommands) {
+      const text = this.consumeRule('BracketString');
+      const format = constants.formattingCommands[command];
+      return applyFormatting(text, format);
+    } else if (command in constants.commands) {
+      return constants.commands[command];
+    } else if (command in constants.mathCommands) {
+      return constants.mathCommands[command];
+    } else if (command in constants.diacritics && !this.matchEndOfFile()) {
+      const text = this.consumeRule('Text');
+      const diacritic = text[0] + constants.diacritics[command];
+      return diacritic.normalize('NFC') + text.slice(1);
+    } else if (command in constants.argumentCommands) {
+      const func = constants.argumentCommands[command];
+      const args = [];
+      let arity = func.length;
+      while (arity-- > 0) {
+        this.consumeToken('whitespace', true);
+        args.push(this.consumeRule('BracketString'));
+      }
+      return func(...args);
+    } else if (/^[&%$#_{}]$/.test(command)) {
+      return commandToken.text.slice(1);
+    } else {
+      return commandToken.text;
+    }
+  },
+  Env() {
+    let output = '';
+    while (!this.matchEndOfFile() && !this.matchToken('rbrace')) {
+      output += this.consumeRule('Text');
+    }
+    return output;
+  },
+  EnclosedEnv() {
+    this.consumeToken('commandBegin');
+    const beginEnv = this.consumeRule('BracketString');
+    let output = '';
+    while (!this.matchToken('commandEnd')) {
+      output += this.consumeRule('Text');
+    }
+    const end = this.consumeToken('commandEnd');
+    const endEnv = this.consumeRule('BracketString');
+    if (beginEnv !== endEnv) {
+      throw new SyntaxError(this.lexer.formatError(end, `environment started with "${beginEnv}", ended with "${endEnv}"`));
+    }
+    return applyFormatting(output, constants.formattingEnvs[beginEnv]);
+  },
+  _() {
+    while (this.matchToken('whitespace')) {
+      this.consumeToken('whitespace');
+    }
+  }
+}, {
+  sentenceCase: false,
+  partlyLowercase: false,
+  afterPunctuation: true
+});
+function singleLanguageIsEnglish(language) {
+  return constants.sentenceCaseLanguages.includes(language.toLowerCase());
+}
+function isEnglish(languages) {
+  if (Array.isArray(languages)) {
+    return languages.every(singleLanguageIsEnglish);
+  }
+  return singleLanguageIsEnglish(languages);
+}
+function getMainRule(fieldType, languages) {
+  if (fieldType[1] === 'name') {
+    return fieldType[0] === 'list' ? 'StringNames' : 'Name';
+  }
+  if (fieldType[1] === 'title') {
+    const option = _config.default.parse.sentenceCase;
+    if (option === 'always' || option === 'english' && isEnglish(languages)) {
+      return 'StringTitleCase';
+    } else {
+      return 'String';
+    }
+  }
+  switch (fieldType[0] === 'field' ? fieldType[1] : fieldType[0]) {
+    case 'list':
+      return 'StringList';
+    case 'separated':
+      return 'StringSeparated';
+    case 'verbatim':
+      return 'StringVerbatim';
+    case 'uri':
+      return 'StringUri';
+    case 'title':
+    case 'literal':
+    default:
+      return 'String';
+  }
+}
+function getLexerState(fieldType) {
+  if (fieldType[1] === 'name') {
+    return 'namesLiteral';
+  }
+  switch (fieldType[0]) {
+    case 'list':
+      return 'listLiteral';
+    case 'separated':
+      return 'separatedLiteral';
+    case 'field':
+    default:
+      return 'stringLiteral';
+  }
+}
+function parse(text, field, languages = []) {
+  const fieldType = constants.fieldTypes[field] || [];
+  return valueGrammar.parse(lexer.reset(text, {
+    state: getLexerState(fieldType),
+    line: 0,
+    col: 0
+  }), getMainRule(fieldType, languages));
+}
+function parseAnnotation(text) {
+  return valueGrammar.parse(lexer.reset(text, {
+    state: 'annotation',
+    line: 0,
+    col: 0
+  }), 'Annotations');
+}

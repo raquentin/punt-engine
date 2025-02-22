@@ -1,0 +1,1 @@
+{"version":3,"file":"const.mjs","sources":["../../../../src/scene/graphics/shared/const.ts"],"sourcesContent":["export type LineCap = 'butt' | 'round' | 'square';\nexport type LineJoin = 'round' | 'bevel' | 'miter';\n\nexport const closePointEps = 1e-4;\nexport const curveEps = 0.0001;\n"],"names":[],"mappings":";AAGO,MAAM,aAAgB,GAAA,KAAA;AACtB,MAAM,QAAW,GAAA;;;;"}

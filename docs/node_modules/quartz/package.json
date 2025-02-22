@@ -1,0 +1,21 @@
+{
+  "name": "quartz",
+  "description": "A module to interface node with transmission-daemon",
+  "author": "Robin Duckett <robin.duckett@gmail.com>",
+  "version": "0.0.1",
+  "keywords": ["transmission", "quartz", "transmission-daemon"],
+  "dependencies": {
+    "request": "*",
+    "underscore": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robinduckett/quartz"
+  },
+  "bugs": {
+    "email": "robin.duckett+quartz@gmail.com",
+    "url": "http://github.com/robinduckett/quartz/issues"
+  },
+  "main": "./quartz.js",
+  "engine": "node 0.6.0"
+}

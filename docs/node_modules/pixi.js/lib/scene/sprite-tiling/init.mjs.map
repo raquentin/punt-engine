@@ -1,0 +1,1 @@
+{"version":3,"file":"init.mjs","sources":["../../../src/scene/sprite-tiling/init.ts"],"sourcesContent":["import { extensions } from '../../extensions/Extensions';\nimport { TilingSpritePipe } from './TilingSpritePipe';\n\nextensions.add(TilingSpritePipe);\n"],"names":[],"mappings":";;;;AAGA,UAAA,CAAW,IAAI,gBAAgB,CAAA"}
