@@ -6,17 +6,22 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
+    flake-utils.lib.eachDefaultSystem (
+      system: let
         pkgs = import nixpkgs {
           inherit system;
         };
 
         haskellPackages = pkgs.haskellPackages;
 
-      packages = {
-          pipelined_order_book = haskellPackages.callCabal2nix "pipelined_order_book" ./cores/pipelined_order_book { };
+        packages = {
+          pipelined_order_book = haskellPackages.callCabal2nix "pipelined_order_book" ./cores/pipelined_order_book {};
         };
 
         devShell = pkgs.mkShell {
@@ -33,8 +38,6 @@
             pkgs.verilator
 
             pkgs.zig
-
-            pkgs.nodejs
           ];
 
           shellHook = ''
@@ -50,4 +53,3 @@
       }
     );
 }
-

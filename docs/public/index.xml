@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+    <channel>
+      <title>Punt Engine</title>
+      <link>https://punt-engine.com</link>
+      <description>Last 10 notes on Punt Engine</description>
+      <generator>Quartz -- quartz.jzhao.xyz</generator>
+      <item>
+    <title>Welcome</title>
+    <link>https://punt-engine.com/</link>
+    <guid>https://punt-engine.com/</guid>
+    <description>This site hosts documentation on punt-engine, a high-frequency trading engine build for FPGAs and maintained by Trading @ Georgia Tech. Objective This project is maintained by undergraduates.</description>
+    <pubDate>Mon, 24 Feb 2025 23:28:44 GMT</pubDate>
+  </item><item>
+    <title>Building a moving average accumulator core</title>
+    <link>https://punt-engine.com/notes/the-intuition-behind-moving-avg-accumulator</link>
+    <guid>https://punt-engine.com/notes/the-intuition-behind-moving-avg-accumulator</guid>
+    <description>This post guides readers from a blank folder to a working and tested moving average accumulator gateware circuit. I’ll first describe the intuition for the algorithm, then implement it in SystemVerilog, then write a Verilator testbench in C++.</description>
+    <pubDate>Mon, 24 Feb 2025 05:00:00 GMT</pubDate>
+  </item><item>
+    <title>Notes</title>
+    <link>https://punt-engine.com/notes/</link>
+    <guid>https://punt-engine.com/notes/</guid>
+    <description></description>
+    <pubDate>Sun, 23 Feb 2025 14:56:43 GMT</pubDate>
+  </item><item>
+    <title>The Punt Engine system</title>
+    <link>https://punt-engine.com/notes/the-punt-engine-system</link>
+    <guid>https://punt-engine.com/notes/the-punt-engine-system</guid>
+    <description></description>
+    <pubDate>Fri, 18 Oct 2024 04:00:00 GMT</pubDate>
+  </item><item>
+    <title>Contributing to the docs site</title>
+    <link>https://punt-engine.com/notes/contributing-to-the-docs-site</link>
+    <guid>https://punt-engine.com/notes/contributing-to-the-docs-site</guid>
+    <description>This is a walkthrough on how to clone this site, write a note, run the site on local, and update remote. Dependencies node v20 npm v9.3.1 git a GitHub account Newer versions will likely work.</description>
+    <pubDate>Tue, 15 Oct 2024 04:00:00 GMT</pubDate>
+  </item>
+    </channel>
+  </rss>
