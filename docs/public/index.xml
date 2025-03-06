@@ -6,6 +6,12 @@
       <description>Last 10 notes on Punt Engine</description>
       <generator>Quartz -- quartz.jzhao.xyz</generator>
       <item>
+    <title>The architecture of a pipelined order book</title>
+    <link>https://punt-engine.com/notes/the-architecture-of-a-pipelined-order-book</link>
+    <guid>https://punt-engine.com/notes/the-architecture-of-a-pipelined-order-book</guid>
+    <description>This page explains the design of a pipelined order book called Pipebomb. Pipebomb Is a Pipelined and Eventually Balanced Order-Managing Book. In short, the hardware module takes in a stream from Nasdaq’s ITCH protocol and maintains calculations of metrics that drive strategic decisions.</description>
+    <pubDate>Thu, 06 Mar 2025 05:00:00 GMT</pubDate>
+  </item><item>
     <title>Welcome</title>
     <link>https://punt-engine.com/</link>
     <guid>https://punt-engine.com/</guid>
@@ -15,6 +21,12 @@
     <title>Building a moving average accumulator core</title>
     <link>https://punt-engine.com/notes/the-intuition-behind-moving-avg-accumulator</link>
     <guid>https://punt-engine.com/notes/the-intuition-behind-moving-avg-accumulator</guid>
+    <description>This post guides readers from a blank folder to a working and tested moving average accumulator gateware circuit. I’ll first describe the intuition for the algorithm, then implement it in SystemVerilog, then write a Verilator testbench in C++.</description>
+    <pubDate>Mon, 24 Feb 2025 05:00:00 GMT</pubDate>
+  </item><item>
+    <title>Building a moving average accumulator core</title>
+    <link>https://punt-engine.com/notes/moving-average-accumulator</link>
+    <guid>https://punt-engine.com/notes/moving-average-accumulator</guid>
     <description>This post guides readers from a blank folder to a working and tested moving average accumulator gateware circuit. I’ll first describe the intuition for the algorithm, then implement it in SystemVerilog, then write a Verilator testbench in C++.</description>
     <pubDate>Mon, 24 Feb 2025 05:00:00 GMT</pubDate>
   </item><item>
