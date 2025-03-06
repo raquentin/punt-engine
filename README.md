@@ -1,10 +1,6 @@
 # 📉 punt-engine
 
-See https://punt-engine.com for full documentation.
-
-## Overview
-
-Punt Engine is an open-source FPGA-accelerated high-frequency trading engine. In short, we input a stream of market data for an asset and output requests buying or selling the asset based on historical trends.
+Punt Engine is an open-source FPGA-accelerated high-frequency trading engine. In short, we input a stream of market data for an asset and output requests buying or selling the asset based on historical trends. See https://punt-engine.com for full documentation.
 
 ## Components
 
