@@ -6,9 +6,13 @@ See https://punt-engine.com for full documentation.
 
 Punt Engine is an open-source FPGA-accelerated high-frequency trading engine. In short, we input a stream of market data for an asset and output requests buying or selling the asset based on historical trends.
 
-The image below summarizes interactions within our FPGA.
+## Components
 
-![punt-engine-systems-design](https://github.com/user-attachments/assets/df477b40-3172-44a5-87f4-cde787ed0c2d)
+### Pipebomb
+**P**ipebomb **I**s a **P**ipelined and **E**ventually **B**alanced **O**rder-**M**anaging **B**ook.
+
+### Madlib
+**M**adlib: **A** **D**MA **L**ibrary via **I**nterconnect **B**uffers
 
 ## Contributing
 

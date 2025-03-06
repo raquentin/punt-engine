@@ -1,55 +1,35 @@
 {
-  description = "A comprehensive development environment for punt-engine.";
+  description = "A dev/build env for punt-engine.";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-    ...
-  }:
-    flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
-
-        haskellPackages = pkgs.haskellPackages;
-
-        packages = {
-          pipelined_order_book = haskellPackages.callCabal2nix "pipelined_order_book" ./cores/pipelined_order_book {};
-        };
-
-        devShell = pkgs.mkShell {
-          buildInputs = [
-            pkgs.haskellPackages.ghc
-            pkgs.haskellPackages.cabal-install
-            pkgs.haskellPackages.clash-prelude
-            pkgs.haskellPackages.clash-lib
-            pkgs.haskellPackages.clash-ghc
-            pkgs.haskellPackages.clash-prelude-hedgehog
-            pkgs.haskellPackages.tasty-hedgehog
-            pkgs.haskellPackages.hedgehog
-
-            pkgs.verilator
-
-            pkgs.zig
+  }: let
+    supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+    forEachSupportedSystem = f:
+      nixpkgs.lib.genAttrs supportedSystems (system:
+        f {
+          pkgs = import nixpkgs {inherit system;};
+        });
+  in {
+    devShells = forEachSupportedSystem ({pkgs}: {
+      default =
+        pkgs.mkShell.override {stdenv = pkgs.llvmPackages_19.libcxxStdenv;}
+        {
+          packages = with pkgs; [
+            llvmPackages_19.libcxxClang
+            llvmPackages_19.clang-tools
+            gdb
+            cmake
+            gtest
+            openssl
+            valgrind
+            ninja
+            verilator
           ];
-
-          shellHook = ''
-            echo ""
-            echo ""
-            echo "Welcome to the punt-engine dev env."
-          '';
         };
-      in {
-        packages = packages;
-
-        devShells.default = devShell;
-      }
-    );
+    });
+  };
 }

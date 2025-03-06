@@ -20,31 +20,5 @@ jobs:
 
       - name: Run Simulation
         run: |
-          cd cores/moving_average_accumulator
+          cd mov_avg_acc
           make test
-
-
-  dmalib-test:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Install Zig (version 0.13)
-      - name: Install Zig
-        uses: mlugg/setup-zig@v1
-        with:
-          zig-version: '0.13.0'  # Specify the exact version you are using
-
-      # Verify Zig installation
-      - name: Verify Zig
-        run: zig version
-
-      # Build the project
-      - name: Build project and run
-        run: |
-          cd dmalib
-          zig build
-          ./zig-out/bin/dmalib
