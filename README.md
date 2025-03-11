@@ -10,7 +10,7 @@ In short, it's a discrete hardware core inputting a stream from Nasdaq’s ITCH 
 
 ![order book design](https://github.com/raquentin/punt-engine/blob/main/docs/content/images/pipelined-ob.png?raw=true)
 
-Learn more by reading the source or [the docs](https://punt-engine.com/notes/the-architecture-of-a-pipelined-order-book#accumulators).
+Learn more by reading the source or [the docs](https://punt-engine.com/notes/the-architecture-of-a-pipelined-order-book).
 
 ### Madlib
 **M**adlib: **A** **D**MA **L**ibrary via **I**nterconnect **B**uffers. It abstracts upon the [Xilinx PCIe DMA drivers](https://github.com/Xilinx/dma_ip_drivers) to provide a C++ programming interface for writing to and reading from FPGA on-board memory. 
