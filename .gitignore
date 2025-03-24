@@ -26,6 +26,9 @@ cabal.project.local~
 /inst
 .nvim/
 
+.DS_Store
+.vscode/settings.json
+
 vivado/project/
 *.jou
 *.log
