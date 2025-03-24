@@ -7,18 +7,30 @@ on:
     branches: [ main ]
 
 jobs:
-  moving-average-accumulator-test:
-    runs-on: ubuntu-latest
-
+  itch_streamgen:
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Install Dependencies
+      - name: Download Dependencies
         run: |
-          sudo apt-get install -y verilator make
+          cd itch_streamgen
+          sudo apt-get install ninja-build
 
-      - name: Run Simulation
+      - name: Configure Build Directory
         run: |
-          cd mov_avg_acc
-          make test
+          mkdir -p build
+          cmake -G Ninja -S . -B build
+
+      - name: Build
+        run: |
+          ninja -C build
+
+      - name: Run Unit Tests
+        run: |
+          ninja runtests -C build
+          ninja memcheck -C build
+
+      - name: Run Valgrind
+        run: |
+          ninja valgrind -C build
