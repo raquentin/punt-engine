@@ -36,6 +36,7 @@ vivado/project/
 *.str
 *.wdb
 *.backup
+.cache/
 
 # Clash generated files
 */clash/generated/
