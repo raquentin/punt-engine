@@ -24,13 +24,16 @@ jobs:
 
       - name: Build
         run: |
+          cd itch_streamgen
           ninja -C build
 
       - name: Run Unit Tests
         run: |
+          cd itch_streamgen
           ninja runtests -C build
           ninja memcheck -C build
 
       - name: Run Valgrind
         run: |
+          cd itch_streamgen
           ninja valgrind -C build
