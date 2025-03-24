@@ -31,7 +31,7 @@ jobs:
         run: |
           cd itch_streamgen
           ninja runtests -C build
-          ninja memcheck -C build
+          # ninja memcheck -C build
 
       - name: Run Valgrind
         run: |
