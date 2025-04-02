@@ -1,0 +1,12 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:punt-engine-haskell-cores"
+    - path: "./tests/doctests.hs"
+      component: "punt-engine-haskell-cores:doctests"
+    - path: "./tests"
+      component: "punt-engine-haskell-cores:test-library"
+    - path: "./bin/Clashi.hs"
+      component: "punt-engine-haskell-cores:exe:clashi"
+    - path: "./bin/Clash.hs"
+      component: "punt-engine-haskell-cores:exe:clash"
