@@ -1,6 +1,5 @@
-# 📉 punt-engine
-
-Punt Engine is an open-source FPGA-accelerated high-frequency trading engine. See https://punt-engine.com for full documentation.
+# punt-engine
+is an open-source FPGA-accelerated high-frequency trading engine. See https://punt-engine.com for full documentation.
 
 > [!IMPORTANT]  
 > development paused, resuming dec 2025
@@ -21,4 +20,5 @@ Learn more by reading the source or [the docs](https://punt-engine.com/notes/the
 ## Contributing
 
 Most contributors are welcome. Begin by reading through our [docs](https://punt-engine.com) and looking through [open issues tagged "help wanted"](https://github.com/raquentin/punt-engine/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
+
 
