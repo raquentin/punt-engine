@@ -37,11 +37,9 @@ module router_ordermap #(
   entry_t cam   [CAM_ENTRIES];
 
   // pipeline regs
-  //   S0
   inst_t  s0_inst;
   logic s0_v, s0_r;
   logic [DEPTH_LOG2-1:0] s0_i0, s0_i1;
-  //   S1, for registered data only
   inst_t s1_inst;
   logic s1_v, s1_r;
   entry_t s1_b0_q, s1_b1_q;

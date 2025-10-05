@@ -33,8 +33,7 @@ module side_processor #(
   entry_t bid_tab[N_ENTRIES];
   entry_t ask_tab[N_ENTRIES];
 
-  // TODO: backpressure
-  assign in_r = 1'b1;
+  assign in_r = out_r;
 
   // linear search; N small
   function automatic int find_idx(input logic side, input logic [PRICE_W-1:0] p);
