@@ -1,5 +1,5 @@
 # punt-engine
-is an collection of open software and gateware for high-frequency trading.
+is an collection of open software and gateware modules for high-frequency trading.
 
 ## Modules
 

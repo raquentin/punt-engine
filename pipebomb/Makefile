@@ -33,7 +33,7 @@ all: test
 
 obj_dir/V$(TOP): $(SRC_SV) $(TB)
 	verilator $(VERILATOR_FLAGS) --cc --exe $(SRC_SV) $(TB) -CFLAGS "$(CXXFLAGS)"
-	$$(MAKE) -C obj_dir -f V$(TOP).mk V$(TOP)
+	$(MAKE) -C obj_dir -f V$(TOP).mk V$(TOP)
 
 sim: obj_dir/V$(TOP)
 	./obj_dir/V$(TOP)
