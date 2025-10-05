@@ -1,61 +1,42 @@
 #include "Vpipebomb_top.h"
 #include "verilated.h"
-#ifdef VM_TRACE_FST
-#include "verilated_fst_c.h"
-using TraceT = VerilatedFstC;
-#else
 #include "verilated_vcd_c.h"
-using TraceT = VerilatedVcdC;
-#endif
-
 #include <cassert>
-#include <csignal>
 #include <cstdint>
 #include <cstdio>
+#include <csignal>
 
 static vluint64_t sim_time = 0;
 
-static TraceT *g_tfp = nullptr; // global so we can flush on failure
+static VerilatedVcdC* g_tfp = nullptr; // global so we can flush on failure
 
-[[noreturn]] static void die_with_trace(const char *msg) {
-  fprintf(stderr, "FATAL @%llu: %s\n", (unsigned long long)sim_time, msg);
-  if (g_tfp) {
-    g_tfp->flush();
-    g_tfp->close();
-  }
+[[noreturn]] static void die_with_trace(const char* msg) {
+  fprintf(stderr, "FATAL @%llu: %s\n",
+          (unsigned long long)sim_time, msg);
+  if (g_tfp) { g_tfp->flush(); g_tfp->close(); }
   Verilated::flushCall();
   exit(1);
 }
 
 struct Sim {
   Vpipebomb_top *dut;
-  TraceT *tfp;
+  VerilatedVcdC *tfp;
   bool tracing;
 
   Sim(bool trace = true) : tracing(trace) {
     Verilated::traceEverOn(tracing);
     dut = new Vpipebomb_top;
     if (tracing) {
-      tfp = new TraceT;
+      tfp = new VerilatedVcdC;
       g_tfp = tfp;
       dut->trace(tfp, 99);
-
-      dut->trace(tfp, 99);
-#ifdef VM_TRACE_FST
-      tfp->open("wave.fst");
-#else
       tfp->open("wave.vcd");
-#endif
     } else {
       tfp = nullptr;
     }
   }
   ~Sim() {
-    if (tfp) {
-      tfp->flush();
-      tfp->close();
-      delete tfp;
-    }
+    if (tfp) { tfp->flush(); tfp->close(); delete tfp; }
     delete dut;
   }
 
@@ -65,17 +46,11 @@ struct Sim {
     // 10ns clock, posedge sim_time%10==5
     dut->clk = 0;
     dut->eval();
-    if (tfp) {
-      tfp->dump(sim_time);
-      tfp->flush();
-    }
+    if (tfp) { tfp->dump(sim_time); tfp->flush(); }
     sim_time += 5;
     dut->clk = 1;
     dut->eval();
-    if (tfp) {
-      tfp->dump(sim_time);
-      tfp->flush();
-    }
+    if (tfp) { tfp->dump(sim_time); tfp->flush(); }
 
     sim_time += 5;
   }
@@ -136,11 +111,9 @@ static void send_add(Sim &S, bool side_is_ask, uint64_t px, uint32_t qty) {
   S.idle(1);
 }
 
-#define CHECK(cond, msg)                                                       \
-  do {                                                                         \
-    if (!(cond))                                                               \
-      die_with_trace(msg);                                                     \
-  } while (0)
+#define CHECK(cond, msg) do { \
+  if (!(cond)) die_with_trace(msg); \
+} while(0)
 
 static void wait_cycles(Sim &S, int n) {
   for (int i = 0; i < n; ++i)
@@ -155,8 +128,7 @@ static int wait_until(Sim &S, Pred p, int max_cycles, const char *what) {
       return i + 1; // cycles waited
   }
   char buf[256];
-  snprintf(buf, sizeof(buf), "timeout waiting for: %s (>%d cycles)", what,
-           max_cycles);
+  snprintf(buf, sizeof(buf), "timeout waiting for: %s (>%d cycles)", what, max_cycles);
   die_with_trace(buf);
 }
 
@@ -174,7 +146,7 @@ static int expect_fill(Sim &S, uint32_t exp_side, uint64_t exp_px,
   return waited;
 }
 
-static void sigint_handler(int) { die_with_trace("SIGINT"); }
+static void sigint_handler(int){ die_with_trace("SIGINT"); }
 int main(int argc, char **argv) {
   Verilated::commandArgs(argc, argv);
   Sim S(true);
@@ -190,18 +162,18 @@ int main(int argc, char **argv) {
   printf("best_ask=101 visible after %d cycles\n", lat1);
   CHECK(d->best_ask_price == 101, "best_ask should be 101 after first insert");
 
-  // 2) Add BID 103 x 7 -> marketable; expect a fill at 101 *for 5* (capped)
-  send_add(S, /*ask*/ false, 103, 7);
 
-  // fill should be qty 5 now (min(resting=5, taker=7))
-  int lat_fill =
-      expect_fill(S, /*maker side=*/1, /*px=*/101, /*qty=*/5, /*max*/ 100);
+    // 2) Add BID 103 x 7 -> marketable; expect a fill at 101 *for 5* (capped)
+    send_add(S, /*ask*/ false, 103, 7);
 
-  // After the capped fill, the residual (2) should be booked as BID @ 103
-  int lat_bid = wait_until(
-      S, [&] { return d->best_bid_price == 103; }, 100,
-      "best_bid == 103 after booking residual");
-  printf("residual booked: best_bid=103 visible after %d cycles\n", lat_bid);
+    // fill should be qty 5 now (min(resting=5, taker=7))
+    int lat_fill = expect_fill(S, /*maker side=*/1, /*px=*/101, /*qty=*/5, /*max*/100);
+
+    // After the capped fill, the residual (2) should be booked as BID @ 103
+    int lat_bid = wait_until(S, [&]{ return d->best_bid_price == 103; }, 100,
+                             "best_bid == 103 after booking residual");
+    printf("residual booked: best_bid=103 visible after %d cycles\n", lat_bid);
+
 
   // wait a couple cycles for book aggregate decrement to ripple
   // TODO: optimize this
@@ -221,6 +193,7 @@ int main(int argc, char **argv) {
 
   printf("PASS: tb_pipebomb_cross (lat1=%d, lat_fill=%d, lat2=%d)\n", lat1,
          lat_fill, lat2);
+
 
   wait_cycles(S, 29);
 
