@@ -3,7 +3,7 @@ RTL_DIR        := ./rtl
 VERILATOR_FLAGS = -sv --language 1800-2017 --trace --top-module $(TOP) -I$(RTL_DIR)
 ALL_SV         := $(wildcard $(RTL_DIR)/*.sv)
 PKG            := $(RTL_DIR)/pipebomb_pkg.sv
-TB_CPP         := ./tb/tb_pipebomb.cpp
+TB_CPP         := ./tb/tb_pipebomb_cross.cpp
 RTL_ALL        := $(filter-out $(PKG),$(wildcard $(RTL_DIR)/*.sv))
 SRC_SV   := $(PKG) $(RTL_ALL)
 

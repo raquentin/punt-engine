@@ -5,6 +5,7 @@
 static vluint64_t sim_time = 0;
 void tick(Vpipebomb_top *top, VerilatedVcdC *tfp) {
   top->clk = 0;
+  top->tfill_tready = 1;  // <-- keep fills path ready
   top->eval();
   if (tfp)
     tfp->dump(sim_time++);

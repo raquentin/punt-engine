@@ -22,7 +22,7 @@ module accumulators #(
   end
 
   // ema = ema + α*(mid - ema)
-  //   α≈0.04 in Q1.15 (0.04*32768 ≈ 1311)
+  // α≈0.04 in Q1.15 (0.04*32768 ≈ 1311)
   localparam logic [15:0] ALPHA_Q1_15 = 16'd1311;
 
   always_ff @(posedge clk or negedge rstn) begin
