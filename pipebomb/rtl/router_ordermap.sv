@@ -2,16 +2,16 @@ module router_ordermap #(
     parameter int DEPTH_LOG2  = 12,
     parameter int CAM_ENTRIES = 8
 ) (
-    input  logic                      clk,
-    input  logic                      rstn,
+    input logic clk,
+    input logic rstn,
 
-    input  logic                      in_v,
-    output logic                      in_r,
-    input  pipebomb_pkg::inst_t       in_d,
+    input  logic                in_v,
+    output logic                in_r,
+    input  pipebomb_pkg::inst_t in_d,
 
-    output logic                      out_v,
-    input  logic                      out_r,
-    output pipebomb_pkg::inst_t       out_d,
+    output logic                out_v,
+    input  logic                out_r,
+    output pipebomb_pkg::inst_t out_d,
 
     output pipebomb_pkg::order_info_t resolved_prev
 );
