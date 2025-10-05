@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  verilator:
+  pipebomb:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,13 +19,20 @@ jobs:
           sudo apt-get install -y verilator make g++
 
       - name: Lint RTL
-        run: make lint
+        run: |
+          cd pipebomb
+          make lint
 
       - name: Build & Run (default TB)
-        run: make test
+        run: |
+          cd pipebomb
+          make test
 
       - name: Build & Run (FST trace)
-        run: make clean && make test TRACE_FMT=fst
+        run: |
+          cd pipebomb
+          make clean
+          make test TRACE_FMT=fst
 
   itch_streamgen:
     runs-on: ubuntu-24.04

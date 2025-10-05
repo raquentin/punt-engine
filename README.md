@@ -20,4 +20,5 @@ Most contributors are welcome. Begin by reading through our [docs](https://punt-
 
 ## Resources
 
-1. 
+1. [Exploring the Potential of Reconfigurable Platforms for Order Book Update](https://www.doc.ic.ac.uk/~wl/papers/17/fpl17ch.pdf)
+2. [Xilinx DMA IP Reference drivers](https://github.com/Xilinx/dma_ip_drivers/tree/master)
