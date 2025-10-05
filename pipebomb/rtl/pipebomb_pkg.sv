@@ -1,12 +1,12 @@
 package pipebomb_pkg;
   parameter int ORDER_ID_BITS = 48;
-  parameter int PRICE_BITS = 48; // in ticks or cents
+  parameter int PRICE_BITS = 48;  // in ticks or cents
   parameter int QTY_BITS = 32;
 
   // Q-format for prices, ema
   parameter int PRICE_INT_W = 32;
   parameter int PRICE_FRAC_W = 16;
-  parameter int PRICE_Q_W = PRICE_BITS + PRICE_FRAC_W; // 48 + 16 = 64
+  parameter int PRICE_Q_W = PRICE_BITS + PRICE_FRAC_W;  // 48 + 16 = 64
 
   typedef enum logic [2:0] {
     ITCH_NOP = 3'd0,
@@ -29,9 +29,9 @@ package pipebomb_pkg;
     side_t side;
     logic [ORDER_ID_BITS-1:0] order_id;
     logic [PRICE_BITS-1:0] price;
-    logic [QTY_BITS-1:0] quantity; // for ADD/CANCEL/EXECUTE
-    logic [ORDER_ID_BITS-1:0] new_order_id; // REPLACE only
-    logic last_in_bundle; // for atomic REPLACE micro-seq bundling
+    logic [QTY_BITS-1:0] quantity;  // for ADD/CANCEL/EXECUTE
+    logic [ORDER_ID_BITS-1:0] new_order_id;  // REPLACE only
+    logic last_in_bundle;  // for atomic REPLACE micro-seq bundling
   } inst_t;
 
   typedef struct packed {

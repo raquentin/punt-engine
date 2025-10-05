@@ -122,7 +122,7 @@ module side_processor #(
             if (idx < 0) begin
               int freei;
               freei = first_free(1'b0);
-              if (freei < 0) freei = 0; // naive overwrite if full
+              if (freei < 0) freei = 0;  // naive overwrite if full
               bid_tab[freei].price <= in_price;
               bid_tab[freei].qty   <= nxt;
               bid_tab[freei].valid <= 1'b1;

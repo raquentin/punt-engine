@@ -24,4 +24,3 @@ binary:
 
 clean:
 	rm -rf obj_dir *.vcd
-

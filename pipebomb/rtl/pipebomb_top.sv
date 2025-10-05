@@ -16,7 +16,6 @@ module pipebomb_top #(
     input  logic [47:0] s_new_order_id,
     input  logic        s_last_in_bundle,
 
-
     output logic        tfill_tvalid,
     input  logic        tfill_tready,
     output logic        tfill_side,
@@ -28,7 +27,7 @@ module pipebomb_top #(
 );
   import pipebomb_pkg::*;
 
-  // repack as inst_t before FIFO
+  // repack as inst_t before fifo
   inst_t s_inst;
   always_comb begin
     s_inst                = '0;
@@ -114,61 +113,65 @@ module pipebomb_top #(
   logic [47:0] bid_best, ask_best;
   logic bid_v, ask_v;
 
-  // --- Match stub path to SP ---
-  logic        ms_sp_v, ms_sp_r;
+  logic ms_sp_v, ms_sp_r;
   logic        ms_sp_valid;
-  logic [2:0]  ms_sp_opcode;
+  logic [ 2:0] ms_sp_opcode;
   logic        ms_sp_side;
   logic [47:0] ms_sp_price;
   logic [31:0] ms_sp_qty;
 
   match_stub u_match (
-    .clk(clk), .rstn(rstn),
+      .clk (clk),
+      .rstn(rstn),
 
-    .in_v     (r_v),
-    .in_r     (r_r),                 // closes the loop to router
-    .in_opcode(r_d_opcode),
-    .in_side  (r_d_side_bit),
-    .in_price (r_d_price_w),
-    .in_qty   (r_d_qty_w),
+      .in_v     (r_v),
+      .in_r     (r_r),  // closes the loop to router
+      .in_opcode(r_d_opcode),
+      .in_side  (r_d_side_bit),
+      .in_price (r_d_price_w),
+      .in_qty   (r_d_qty_w),
 
-    .best_bid_price(bid_best),
-    .best_ask_price(ask_best),
-    .best_bid_v    (bid_v),
-    .best_ask_v    (ask_v),
+      .best_bid_price(bid_best),
+      .best_ask_price(ask_best),
+      .best_bid_v    (bid_v),
+      .best_ask_v    (ask_v),
 
-    // to side_processor (either passthrough or synthetic EXEC)
-    .sp_v     (ms_sp_v),
-    .sp_r     (ms_sp_r),
-    .sp_valid (ms_sp_valid),
-    .sp_opcode(ms_sp_opcode),
-    .sp_side  (ms_sp_side),
-    .sp_price (ms_sp_price),
-    .sp_qty   (ms_sp_qty),
+      .sp_v         (ms_sp_v),
+      .sp_r         (ms_sp_r),
+      .sp_valid     (ms_sp_valid),
+      .sp_opcode    (ms_sp_opcode),
+      .sp_side      (ms_sp_side),
+      .sp_price     (ms_sp_price),
+      .sp_qty       (ms_sp_qty),
+      .sp_tap_v     (sp_v),
+      .sp_tap_side  (sp_side),
+      .sp_tap_price (sp_price),
+      .sp_tap_newqty(sp_new_qty),
 
-    // fills: drive TOP ports
-    .tfill_v     (tfill_tvalid),
-    .tfill_r     (tfill_tready),
-    .tfill_side  (tfill_side),
-    .tfill_price (tfill_price),
-    .tfill_qty   (tfill_qty)
+      .tfill_v    (tfill_tvalid),
+      .tfill_r    (tfill_tready),
+      .tfill_side (tfill_side),
+      .tfill_price(tfill_price),
+      .tfill_qty  (tfill_qty)
   );
 
-  // Feed side_processor from match_stub (not directly from router)
-  side_processor #(.N_ENTRIES(64)) u_sp (
-    .clk(clk), .rstn(rstn),
-    .in_v      (ms_sp_v),
-    .in_r      (ms_sp_r),
-    .in_valid  (ms_sp_valid),
-    .in_opcode (ms_sp_opcode),
-    .in_side   (ms_sp_side),
-    .in_price  (ms_sp_price),
-    .in_qty    (ms_sp_qty),
-    .out_v      (sp_v),
-    .out_r      (1'b1),
-    .out_side   (sp_side),
-    .out_price  (sp_price),
-    .out_new_qty(sp_new_qty)
+  side_processor #(
+      .N_ENTRIES(64)
+  ) u_sp (
+      .clk        (clk),
+      .rstn       (rstn),
+      .in_v       (ms_sp_v),
+      .in_r       (ms_sp_r),
+      .in_valid   (ms_sp_valid),
+      .in_opcode  (ms_sp_opcode),
+      .in_side    (ms_sp_side),
+      .in_price   (ms_sp_price),
+      .in_qty     (ms_sp_qty),
+      .out_v      (sp_v),
+      .out_r      (1'b1),
+      .out_side   (sp_side),
+      .out_price  (sp_price),
+      .out_new_qty(sp_new_qty)
   );
 
   price_cache_sorted #(
@@ -196,15 +199,11 @@ module pipebomb_top #(
       .best_valid  (ask_v)
   );
 
-  // If both sides valid, best bid < best ask
+  // if both sides valid, best bid < best ask
   property p_spread_ok;
-    @(posedge clk) disable iff(!rstn)
-    (bid_v && ask_v) |-> (bid_best < ask_best);
+    @(posedge clk) disable iff (!rstn) (bid_v && ask_v) |-> (bid_best < ask_best);
   endproperty
   assert property (p_spread_ok);
-
-
-
 
   logic [pipebomb_pkg::PRICE_Q_W-1:0] mid_q32_16, ema_q32_16;
   logic ema_valid;
@@ -221,14 +220,18 @@ module pipebomb_top #(
 
   // exposed combined
   logic [47:0] best_bid_q, best_ask_q;
-  logic        bid_v_q,    ask_v_q;
+  logic bid_v_q, ask_v_q;
   always_ff @(posedge clk or negedge rstn) begin
     if (!rstn) begin
-      best_bid_q <= '0; best_ask_q <= '0;
-      bid_v_q    <= 1'b0; ask_v_q <= 1'b0;
+      best_bid_q <= '0;
+      best_ask_q <= '0;
+      bid_v_q    <= 1'b0;
+      ask_v_q <= 1'b0;
     end else begin
-      best_bid_q <= bid_best; best_ask_q <= ask_best;
-      bid_v_q    <= bid_v;    ask_v_q    <= ask_v;
+      best_bid_q <= bid_best;
+      best_ask_q <= ask_best;
+      bid_v_q    <= bid_v;
+      ask_v_q    <= ask_v;
     end
   end
   assign best_bid_price = best_bid_q;
