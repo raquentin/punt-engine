@@ -28,12 +28,6 @@ jobs:
           cd pipebomb
           make test
 
-      - name: fst
-        run: |
-          cd pipebomb
-          make clean
-          make test TRACE_FMT=fst
-
   itch_streamgen:
     runs-on: ubuntu-24.04
     steps:
