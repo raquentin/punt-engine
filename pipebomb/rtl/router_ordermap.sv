@@ -177,8 +177,8 @@ module router_ordermap #(
   always_ff @(posedge clk or negedge rstn) begin
     if (!rstn) begin
       for (int i = 0; i < DEPTH; i++) begin
-        bank0[i].info.valid <= 1'b0;
-        bank1[i].info.valid <= 1'b0;
+        bank0[i].info.valid = 1'b0;
+        bank1[i].info.valid = 1'b0;
       end
       for (int i = 0; i < CAM_ENTRIES; i++) cam[i].info.valid <= 1'b0;
     end else if (s1_v && out_r) begin

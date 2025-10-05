@@ -10,25 +10,25 @@ jobs:
   pipebomb:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: deps
         run: |
           sudo apt-get update
           sudo apt-get install -y verilator make g++
 
-      # - name: Lint RTL
-      #   run: |
-      #     cd pipebomb
-      #     make lint
+      - name: lint
+        run: |
+          cd pipebomb
+          make lint
 
-      - name: Build & Run (default TB)
+      - name: test
         run: |
           cd pipebomb
           make test
 
-      - name: Build & Run (FST trace)
+      - name: fst
         run: |
           cd pipebomb
           make clean
